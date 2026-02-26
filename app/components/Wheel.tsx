@@ -294,7 +294,7 @@ export default function Wheel() {
           </div>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row items-center gap-3">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-3">
         <button
           onClick={spin}
           disabled={spinning}
