@@ -114,13 +114,11 @@ export default function Wheel() {
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <p className="text-center mb-2 h-14 sm:h-16 flex items-center justify-center">
-        {showResult ? (
+      {showResult && (
+        <p className="text-center mb-2 h-14 sm:h-16 flex items-center justify-center">
           <span className="text-4xl sm:text-5xl font-bold text-amber-950">No!</span>
-        ) : (
-          <span className="text-xl text-amber-800/90">Spin the wheel to find out.</span>
-        )}
-      </p>
+        </p>
+      )}
       <div
         className="relative flex items-center justify-center wheel-container"
         style={{ width: "var(--wheel-size)", height: "var(--wheel-size)" }}
@@ -280,9 +278,9 @@ export default function Wheel() {
       <button
         onClick={spin}
         disabled={spinning}
-        className="px-12 py-5 text-2xl sm:text-3xl font-bold uppercase tracking-widest rounded-2xl bg-amber-500 text-amber-950 shadow-lg hover:bg-amber-400 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 border-4 border-amber-700 min-w-[11rem] sm:min-w-[12rem]"
+        className="px-12 py-5 text-2xl sm:text-3xl font-bold uppercase tracking-widest rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-600/40 hover:bg-emerald-400 hover:shadow-emerald-500/50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 border-4 border-emerald-700 min-w-[11rem] sm:min-w-[12rem] ring-2 ring-emerald-400/50"
       >
-        Spin
+        SPIN!
       </button>
     </div>
   );
