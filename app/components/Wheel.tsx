@@ -7,9 +7,17 @@ import confetti from "canvas-confetti";
 const SEGMENTS = 12;
 const DEG_PER_SEGMENT = 360 / SEGMENTS;
 // Pointer at top (0°). With rotate(R), viewer top shows wheel local angle (360−R) mod 360.
-// We want wheel 285° (segment 9, NO center) at top, so (360−R)≡285 => R≡75.
+// Segment indices: 0–11, each 30°. Even = "Yes", odd = "No".
+// We want specific segment centers at the top:
+// - NO segment index 9 => centerAngle = (9.5 * 30) = 285°, so (360−R)≡285 => R≡75.
+// - YES segment index 8 => centerAngle = (8.5 * 30) = 255°, so (360−R)≡255 => R≡105.
 const FULL_SPINS = 5;
-const LAND_AT_DEG = 75; // so wheel's 285° (NO) is at top
+const NO_SEGMENT_INDEX = 9;
+const YES_SEGMENT_INDEX = 8;
+const NO_CENTER_ANGLE = (NO_SEGMENT_INDEX + 0.5) * DEG_PER_SEGMENT;
+const YES_CENTER_ANGLE = (YES_SEGMENT_INDEX + 0.5) * DEG_PER_SEGMENT;
+const LAND_AT_DEG_NO = (360 - NO_CENTER_ANGLE + 360) % 360; // 75
+const LAND_AT_DEG_YES = (360 - YES_CENTER_ANGLE + 360) % 360; // 105
 const SPIN_DURATION_MS = 4000;
 // cubic-bezier(0.17, 0.67, 0.12, 0.99) ease-out
 function easeOutCubic(t: number) {
@@ -22,7 +30,12 @@ function segmentAtTop(rotationDeg: number) {
   return Math.floor(normalized / DEG_PER_SEGMENT) % SEGMENTS;
 }
 
-export default function Wheel() {
+interface WheelProps {
+  name: string;
+  isAlwaysYes: boolean;
+}
+
+export default function Wheel({ name, isAlwaysYes }: WheelProps) {
   const [spinning, setSpinning] = useState(false);
   const [displayRotation, setDisplayRotation] = useState(0);
   const [tickerTrigger, setTickerTrigger] = useState(0);
@@ -57,7 +70,8 @@ export default function Wheel() {
     }
     const startDeg = rotationRef.current;
     const remainder = ((startDeg % 360) + 360) % 360;
-    let extra = (LAND_AT_DEG - remainder + 360) % 360;
+    const landAtDeg = isAlwaysYes ? LAND_AT_DEG_YES : LAND_AT_DEG_NO;
+    let extra = (landAtDeg - remainder + 360) % 360;
     if (extra === 0) extra = 360;
     const endDeg = startDeg + FULL_SPINS * 360 + extra;
     const startTime = performance.now();
@@ -111,10 +125,12 @@ export default function Wheel() {
       }
     };
     rafRef.current = requestAnimationFrame(tick);
-  }, [spinning]);
+  }, [isAlwaysYes, spinning]);
 
   const shareResult = useCallback(async () => {
-    const text = "Was Layson Right? No! ❌ https://islaysonright.com";
+    const resultWord = isAlwaysYes ? "Yes" : "No";
+    const emoji = isAlwaysYes ? "✅" : "❌";
+    const text = `Was ${name} Right? ${resultWord}! ${emoji} https://islaysonright.com`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -122,7 +138,7 @@ export default function Wheel() {
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [isAlwaysYes, name]);
 
   return (
     <div className="flex flex-col items-center gap-8">
@@ -282,14 +298,14 @@ export default function Wheel() {
             boxShadow: "inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4)",
           }}
         />
-        {/* No! overlay in center of wheel when result is shown */}
+        {/* Yes! / No! overlay in center of wheel when result is shown */}
         {showResult && (
           <div
             className="absolute left-1/2 top-1/2 z-30 pointer-events-none flex items-center justify-center"
             style={{ transform: "translate(-50%, calc(-50% - 0.3em))" }}
           >
             <span className="no-pop-in text-6xl sm:text-7xl md:text-8xl font-black text-white drop-shadow-[0_3px_8px_rgba(0,0,0,0.85)] leading-none inline-block">
-              No!
+              {isAlwaysYes ? "Yes!" : "No!"}
             </span>
           </div>
         )}
