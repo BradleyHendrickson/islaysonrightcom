@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 
@@ -180,7 +181,7 @@ export default function Wheel() {
             transformOrigin: "center center",
             transform: `rotate(${displayRotation}deg)`,
             "--peg-r": "calc(var(--wheel-size) * 0.5 - 12px)",
-          }}
+          } as CSSProperties}
         >
           <div
             className="relative rounded-full border-[8px] border-amber-900 shadow-2xl overflow-hidden w-full h-full"
@@ -195,7 +196,7 @@ export default function Wheel() {
                   return `${isNo ? "#3b82b6" : "#f59e0b"} ${start}deg ${end}deg`;
                 })
                 .join(", ")})`,
-            }}
+            } as CSSProperties}
           >
             {/* Labels: one per segment, centered in wedge. 0° = top, clockwise. */}
           <div
