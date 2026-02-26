@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wheel-size: min(85vmin, 420px);
+  --pointer-bottom: 12px;
+}
+
+body {
+  min-height: 100vh;
+}
+
+@keyframes spin-wheel {
+  to {
+    transform: rotate(var(--spin-end-deg, 1800deg));
+  }
+}
+
+.wheel-spin {
+  animation: spin-wheel 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+}
+
+@keyframes ticker-hit {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  30% { transform: translateX(-50%) rotate(-8deg); }
+  70% { transform: translateX(-50%) rotate(8deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+.ticker-tab.ticker-hit {
+  animation: ticker-hit 0.12s ease-out;
+}
