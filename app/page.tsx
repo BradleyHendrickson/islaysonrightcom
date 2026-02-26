@@ -10,6 +10,7 @@ export default function Home() {
           alt="Layson"
           width={280}
           height={280}
+          priority
           className="rounded-full object-cover w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64"
         />
       </div>
