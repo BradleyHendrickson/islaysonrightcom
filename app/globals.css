@@ -31,3 +31,39 @@ body {
 .ticker-tab.ticker-hit {
   animation: ticker-hit 0.12s ease-out;
 }
+
+@keyframes no-pop-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.no-pop-in {
+  animation: no-pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes share-pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.share-pop-in {
+  animation: share-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

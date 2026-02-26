@@ -27,6 +27,7 @@ export default function Wheel() {
   const [displayRotation, setDisplayRotation] = useState(0);
   const [tickerTrigger, setTickerTrigger] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [copied, setCopied] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
   const rotationRef = useRef(0);
   const rafRef = useRef<number>(0);
@@ -112,13 +113,19 @@ export default function Wheel() {
     rafRef.current = requestAnimationFrame(tick);
   }, [spinning]);
 
+  const shareResult = useCallback(async () => {
+    const text = "Was Layson Right? No! ❌ https://islaysonright.com";
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center gap-8">
-      {showResult && (
-        <p className="text-center mb-2 h-14 sm:h-16 flex items-center justify-center">
-          <span className="text-4xl sm:text-5xl font-bold text-amber-950">No!</span>
-        </p>
-      )}
       <div
         className="relative flex items-center justify-center wheel-container"
         style={{ width: "var(--wheel-size)", height: "var(--wheel-size)" }}
@@ -155,7 +162,7 @@ export default function Wheel() {
             );
           })}
         </div>
-        {/* Ticker: key forces remount so hit animation replays every peg pass (only when trigger > 0) */}
+        {/* Ticker: single red pointer with dark outline + drop shadow; key forces remount so hit animation replays every peg pass */}
         <div
           key={tickerTrigger}
           className={`ticker-tab absolute z-20 w-0 h-0 ${tickerTrigger > 0 ? "ticker-hit" : ""}`}
@@ -166,7 +173,8 @@ export default function Wheel() {
             borderRight: "14px solid transparent",
             borderTop: "36px solid #dc2626",
             borderBottom: "none",
-            filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.35))",
+            // First shadow = tight dark outline, second = softer drop shadow
+            filter: "drop-shadow(0 0 1px #7f1d1d) drop-shadow(0 2px 4px rgba(0,0,0,0.45))",
             transform: "translateX(-50%)",
             transformOrigin: "center top",
           }}
@@ -274,14 +282,36 @@ export default function Wheel() {
             boxShadow: "inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4)",
           }}
         />
+        {/* No! overlay in center of wheel when result is shown */}
+        {showResult && (
+          <div
+            className="absolute left-1/2 top-1/2 z-30 pointer-events-none flex items-center justify-center"
+            style={{ transform: "translate(-50%, calc(-50% - 0.3em))" }}
+          >
+            <span className="no-pop-in text-6xl sm:text-7xl md:text-8xl font-black text-white drop-shadow-[0_3px_8px_rgba(0,0,0,0.85)] leading-none inline-block">
+              No!
+            </span>
+          </div>
+        )}
       </div>
-      <button
-        onClick={spin}
-        disabled={spinning}
-        className="px-12 py-5 text-2xl sm:text-3xl font-bold uppercase tracking-widest rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-600/40 hover:bg-emerald-400 hover:shadow-emerald-500/50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 border-4 border-emerald-700 min-w-[11rem] sm:min-w-[12rem] ring-2 ring-emerald-400/50"
-      >
-        SPIN!
-      </button>
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <button
+          onClick={spin}
+          disabled={spinning}
+          className="flex items-center justify-center px-12 py-5 text-2xl sm:text-3xl font-bold uppercase tracking-widest rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-600/40 hover:bg-emerald-400 hover:shadow-emerald-500/50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 border-4 border-emerald-700 min-w-[11rem] sm:min-w-[12rem] ring-2 ring-emerald-400/50 h-[4.5rem]"
+        >
+          SPIN!
+        </button>
+        {showResult && (
+          <button
+            type="button"
+            onClick={shareResult}
+            className="share-pop-in flex items-center justify-center px-8 py-5 text-xl sm:text-2xl font-bold rounded-2xl bg-amber-100 text-amber-950 border-4 border-amber-700 hover:bg-amber-200 active:scale-[0.98] transition-all duration-200 h-[4.5rem] min-w-[8rem]"
+          >
+            {copied ? "Copied!" : "Share"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
