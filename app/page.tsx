@@ -5,7 +5,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Wheel from "./components/Wheel";
 
-const SPECIAL_NAMES = new Set(["brad", "bradley", "rinth"]);
+const SPECIAL_NAMES = new Set([
+  "brad",
+  "bradley",
+  "rinth",
+  "the spinning wheel",
+  "spinning wheel",
+  "wheel",
+  "this website",
+  "this site",
+]);
 
 function isAlwaysYesName(raw: string): boolean {
   const normalized = raw.trim().toLowerCase();
