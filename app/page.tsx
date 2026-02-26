@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Wheel from "./components/Wheel";
 
 const SPECIAL_NAMES = new Set(["brad", "bradley", "rinth"]);
@@ -32,6 +33,16 @@ export default function Home() {
       return () => clearTimeout(t);
     }
   }, [modalOpen, name]);
+
+  // Lock body scroll on mobile when modal is open
+  useEffect(() => {
+    if (!modalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [modalOpen]);
 
   const closeModal = useCallback(() => setModalOpen(false), []);
 
@@ -76,52 +87,55 @@ export default function Home() {
         Change Name
       </button>
 
-      {modalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="change-name-title"
-        >
-          <div className="bg-amber-50 border-4 border-amber-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
-            <h2
-              id="change-name-title"
-              className="text-xl font-bold text-amber-950 mb-3"
-            >
-              Change name
-            </h2>
-            <p className="text-amber-800 text-sm mb-3">
-              Who should we check is right?
-            </p>
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Enter name"
-              className="w-full px-4 py-3 rounded-xl border-2 border-amber-700 bg-white text-amber-950 placeholder-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-600 mb-4"
-            />
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="px-4 py-2 rounded-xl font-medium text-amber-800 bg-amber-100 border-2 border-amber-700 hover:bg-amber-200 transition-colors"
+      {modalOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 min-h-[100dvh] min-h-screen overscroll-contain"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="change-name-title"
+          >
+            <div className="bg-amber-50 border-4 border-amber-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm max-h-[85vh] overflow-auto">
+              <h2
+                id="change-name-title"
+                className="text-xl font-bold text-amber-950 mb-3"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={!inputValue.trim()}
-                className="px-4 py-2 rounded-xl font-medium text-white bg-amber-600 border-2 border-amber-800 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Save
-              </button>
+                Change name
+              </h2>
+              <p className="text-amber-800 text-sm mb-3">
+                Who should we check is right?
+              </p>
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Enter name"
+                className="w-full px-4 py-3 rounded-xl border-2 border-amber-700 bg-white text-amber-950 placeholder-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-600 mb-4 text-base"
+              />
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="min-h-[44px] min-w-[44px] px-5 py-2.5 rounded-xl font-medium text-amber-800 bg-amber-100 border-2 border-amber-700 hover:bg-amber-200 active:bg-amber-300 transition-colors touch-manipulation"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={!inputValue.trim()}
+                  className="min-h-[44px] min-w-[44px] px-5 py-2.5 rounded-xl font-medium text-white bg-amber-600 border-2 border-amber-800 hover:bg-amber-500 active:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+                >
+                  Save
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </main>
   );
 }
